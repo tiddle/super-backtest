@@ -1,8 +1,9 @@
 # Super Backtest
 
+(Working title)
+
 By Carlo Cruz
 
-Working title
 
 ## How to use
 
@@ -37,6 +38,7 @@ A backtesting framework that iterates through a set of candles.
   - Add functionality that allows params to be passed in so that it can find the right balance
 - Modularity
   - Make it more generic
+- Fix no budget issue
 
 
 ## Licenses

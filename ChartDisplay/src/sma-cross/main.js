@@ -1,8 +1,8 @@
 import '../../style.css'
 import { NightVision, Scripts } from 'night-vision'
-import data from '../../../data/SMA CrossV2/ohlcv.json';
-import TradesData from '../../../data/SMA CrossV2/purchases.json'
-import Cross from '../../../data/SMA CrossV2/cross.json';
+import data from '../../../data/SMA Cross/ohlcv.json';
+import TradesData from '../../../data/SMA Cross/purchases.json'
+import Cross from '../../../data/SMA Cross/cross.json';
 import Dots from '../nv-scripts/dots.navy';
 import Trades from '../nv-scripts/trades.navy';
 

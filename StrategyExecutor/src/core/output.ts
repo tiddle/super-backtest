@@ -13,7 +13,7 @@ export function tradeDetails(completedTrades: Trade[]): number[][] {
 			trade.exitCandle?.DateTime || '0'
 		).getTime();
 		const profitLossPercent =
-			Math.sign(trade.size) * ((trade.exitPrice || 0) / trade.price - 1);
+			(trade.type === 'short' ? -1 : 1) * ((trade.exitPrice || 0) / trade.price - 1);
 		return [
 			purchaseCandleTimestamp,
 			trade.price,
@@ -96,15 +96,15 @@ export function statsOutput(
 			end,
 			totalDuration,
 			candleCount,
-			exposureTime,
-			buyAndHoldReturn,
+			exposureTime.toFixed(3),
+			buyAndHoldReturn.toFixed(3),
 			maxTradeDuration,
 			avgTradeDuration,
-			winRate,
-			bestTrade,
-			worstTrade,
+			winRate.toFixed(3),
+			bestTrade.toFixed(3),
+			worstTrade.toFixed(3),
 			tradeAmount,
-			profitLoss,
+			profitLoss.toFixed(3),
 		],
 		{
 			index: [

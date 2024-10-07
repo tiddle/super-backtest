@@ -12,12 +12,12 @@ body {
     background-color: #0c0d0e;
 }
 </style>
-<h1>SMA Cross</h1>
+<h1 style="margin-top: 0">SMA Cross</h1>
 <div id="sma-cross-chart-container"></div>
 `
 let chart = new NightVision('sma-cross-chart-container', {
     width: '1280',
-    height: '800',
+    height: '600',
     scripts: [Dots, Trades]
 })
 chart.data = {

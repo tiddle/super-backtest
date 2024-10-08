@@ -1,4 +1,3 @@
-import { SMA } from 'npm:technicalindicators';
 import { DataFrame, toJSON } from 'npm:danfojs-node';
 import {
 	formatISO,
@@ -17,6 +16,7 @@ import type {
 } from '../../types.ts';
 
 import { barCrossDown, barCrossUp } from './util.ts';
+import { SMA } from '../../core/indicators/sma.ts';
 
 const orders: Order[] = [];
 const trades: Trade[] = [];
@@ -45,12 +45,7 @@ export function init({
 
 	df['DateTime'] = df['DateTime'].map((d: number) => formatISO(new Date(d)));
 
-	const lineA = [
-		...new Array(params.n1 - 1),
-		...SMA.calculate({ period: params.n1, values: df['Close'].values }),
-	];
-
-	df.addColumn('LineA', lineA, { inplace: true });
+  const lineA = SMA(30, df, 'lineA')
 
 	const crossUpData = barCrossUp(lineA, df);
 	const crossDownData = barCrossDown(lineA, df);

@@ -1,5 +1,9 @@
+import { DataFrame } from 'npm:danfojs-node';
 import { btcmarkets } from 'npm:ccxt@4.4.5';
-import { add } from 'npm:date-fns/add';
+import {
+	formatISO,
+  add
+} from 'npm:date-fns';
 
 import { init, iterator } from './Strategy/SMACross/main.ts';
 import { createOutputFiles } from './Strategy/SMACross/output.ts';
@@ -16,18 +20,24 @@ const historyCandlesDF = await btcmarketsExchange.fetchOHLCV(
 	timestamp
 );
 
+const df = new DataFrame(historyCandlesDF, {
+  columns: ['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume'],
+});
+
+df['DateTime'] = df['DateTime'].map((d: number) => formatISO(new Date(d)));
+
 const bank = 1000000;
 
 const params: initParams = {
 	name: 'SMA Cross',
-	historyCandlesDF,
+	df,
 	createOrderFunc: createOrder,
 	dynamicTradingFunc: dynamicTrading,
 	bankParam: bank,
 };
 
-const df = init(params);
-const completedTrades = iterator(df);
+const dfIndicators = init(params);
+const completedTrades = iterator(dfIndicators);
 
 await createOutputFiles(df, completedTrades, params.name);
 

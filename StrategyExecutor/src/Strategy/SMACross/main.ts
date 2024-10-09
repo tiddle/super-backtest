@@ -17,6 +17,7 @@ import type {
 
 import { barCrossDown, barCrossUp } from './util.ts';
 import { SMA } from '../../core/indicators/sma.ts';
+import { ATR } from '../../core/indicators/atr.ts';
 
 const orders: Order[] = [];
 const trades: Trade[] = [];
@@ -27,7 +28,7 @@ let bank = -1;
 
 export function init({
 	createOrderFunc,
-	historyCandlesDF,
+	df,
 	bankParam,
 	dynamicTradingFunc,
 }: initParams) {
@@ -38,14 +39,8 @@ export function init({
 		dynamicTrading = dynamicTradingFunc;
 	}
 
-	const params = { n1: 300 };
-	const df = new DataFrame(historyCandlesDF, {
-		columns: ['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume'],
-	});
-
-	df['DateTime'] = df['DateTime'].map((d: number) => formatISO(new Date(d)));
-
-  const lineA = SMA(30, df, 'lineA')
+  const lineA = SMA(300, df, 'lineA');
+  const atrLine = ATR(14, df, 'ATR');
 
 	const crossUpData = barCrossUp(lineA, df);
 	const crossDownData = barCrossDown(lineA, df);

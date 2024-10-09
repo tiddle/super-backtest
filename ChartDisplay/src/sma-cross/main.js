@@ -44,7 +44,7 @@ chart.data = {
             props: {
                 color: 'red'
             }
-        }, 
+        },
         {
             name: 'Cross',
             type: 'Dots',
@@ -62,5 +62,22 @@ chart.data = {
             }
         }
       ]
+    }, {
+      overlays: [{
+        name: 'ATR',
+        type: 'Spline',
+        data: data.reduce((acc, p) => { 
+            if(p[7]) 
+                acc.push([p[0], p[7]]);
+
+            return acc;
+        }, []),
+        settings: {
+            precision: 4
+        },
+        props: {
+            color: 'yellow'
+        }
+      }]
     }]
 }

@@ -46,6 +46,7 @@ export type initParams = {
 	createOrderFunc: CreateOrderFunction;
 	dynamicTradingFunc?: DynamicTradingFunction;
 	bankParam: number;
+  df: DataFrame;
 }
 
 const PurchaseValues = ['short', 'long'];

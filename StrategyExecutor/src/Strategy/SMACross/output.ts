@@ -1,22 +1,18 @@
 import { DataFrame } from 'npm:danfojs-node';
-import { existsSync } from 'jsr:@std/fs';
-import type { Trade } from '../../types.ts';
-import { createOHLCV, statsOutput, tradeDetails } from '../../core/output.ts';
+import type { marketDetails, Trade } from '../../types.ts';
+import { createFiles, createOHLCV, statsOutput, tradeDetails } from '../../core/output.ts';
 
 export async function createOutputFiles(
   df: DataFrame,
   completedTrades: Trade[],
-  name: string
+  name: string,
+  marketDetails: marketDetails
 ) {
   const Cross: number[][] = [];
   const SMA: number[][] = [];
   const ATR: number[][] = [];
   const OHLCV = createOHLCV(df);
   const path = `../data/${name}`;
-
-  if (!existsSync(path)) {
-    await Deno.mkdirSync(path);
-  }
 
   OHLCV.forEach((curr) => {
     if (Array.isArray(curr)) {
@@ -38,33 +34,28 @@ export async function createOutputFiles(
     }
   });
 
-  Deno.writeFile(
-    `${path}/ohlcv.json`,
-    new TextEncoder().encode(JSON.stringify(OHLCV))
-  );
-
-  Deno.writeFile(
-    `${path}/sma.json`,
-    new TextEncoder().encode(JSON.stringify(SMA))
-  );
-
-  Deno.writeFile(
-    `${path}/atr.json`,
-    new TextEncoder().encode(JSON.stringify(ATR))
-  );
-
-  Deno.writeFile(
-    `${path}/cross.json`,
-    new TextEncoder().encode(JSON.stringify(Cross))
-  );
-
   const tradeDetailsArr = tradeDetails(completedTrades);
   const statsDF = statsOutput(tradeDetailsArr, OHLCV, df, name);
 
   statsDF.print();
 
-  Deno.writeFile(
-    `${path}/trades.json`,
-    new TextEncoder().encode(JSON.stringify(tradeDetailsArr))
-  );
+  createFiles(path, [{
+    name: 'ohlcv',
+    data: OHLCV
+  }, {
+    name: 'cross',
+    data: Cross
+  }, {
+    name: 'sma',
+    data: SMA
+  }, {
+    name: 'atr',
+    data: ATR
+  }, {
+    name: 'trades',
+    data: tradeDetailsArr
+  }, {
+    name: 'marketDetails',
+    data: marketDetails
+  }])
 }

@@ -5,13 +5,15 @@ import {
   differenceInHours,
 } from 'npm:date-fns';
 
-import type {
-  Order,
-  Trade,
-  Candle,
-  CreateOrderFunction,
-  DynamicTradingFunction,
-  initParams,
+import {
+  type Order,
+  type Trade,
+  type Candle,
+  type CreateOrderFunction,
+  type DynamicTradingFunction,
+  type initParams,
+  LONG,
+  SHORT,
 } from '../../types.ts';
 
 import { barCrossDown, barCrossUp } from './util.ts';
@@ -83,7 +85,7 @@ function processOrders(candle: Candle, candleRow: number, bankParam: number) {
         return;
       }
 
-      if (order.type === 'long') {
+      if (order.type === LONG) {
         if (order.price < candle.High) {
           bank -= candle.Open;
           trades.push(createTrade(order, candle, candleRow));
@@ -91,7 +93,7 @@ function processOrders(candle: Candle, candleRow: number, bankParam: number) {
         }
       }
 
-      if (order.type === 'short') {
+      if (order.type === SHORT) {
         if (order.price > candle.High) {
           bank -= candle.Open;
           trades.push(createTrade(order, candle, candleRow));

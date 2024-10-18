@@ -1,8 +1,10 @@
 import { DataFrame, Series } from 'npm:danfojs-node';
+import { existsSync } from 'jsr:@std/fs';
 import { differenceInDays } from 'npm:date-fns/differenceInDays';
 import { formatISO } from 'npm:date-fns/formatISO';
 import { parseISO } from 'npm:date-fns/parseISO';
-import type { Trade } from '../types.ts';
+
+import type { Trade, FileData } from '../types.ts';
 
 export function tradeDetails(completedTrades: Trade[]): number[][] {
   return completedTrades.map((trade: Trade) => {
@@ -156,4 +158,22 @@ function computeReturnPct(values: Series) {
   const finalValue = values.iat(values.size - 1) as number;
   const initialValue = values.iat(0) as number;
   return ((finalValue - initialValue) / initialValue) * 100;
+}
+
+export async function createFiles(path = '', valArr: FileData[] = []) {
+  if (valArr.length === 0) {
+    return;
+  }
+
+  if (!existsSync(path)) {
+    await Deno.mkdirSync(path);
+  }
+
+  valArr.forEach((c) => {
+    Deno.writeFile(
+      `${path}/${c.name}.json`,
+      new TextEncoder().encode(JSON.stringify(c.data))
+    );
+  });
+
 }

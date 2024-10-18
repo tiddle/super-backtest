@@ -1,6 +1,7 @@
 import '../../style.css'
 import { NightVision } from 'night-vision'
 import data from '../../../data/SMA Cross/ohlcv.json';
+import marketDetails from '../../../data/SMA Cross/marketDetails.json';
 import TradesData from '../../../data/SMA Cross/trades.json'
 import Cross from '../../../data/SMA Cross/cross.json';
 import SMA from '../../../data/SMA Cross/sma.json';
@@ -68,7 +69,7 @@ const TradesConfig = {
 chart.data = {
   panes: [{
     overlays: [{
-      name: 'BTC/AUD btcmarkets',
+      name: marketDetails.symbol + ' ' + marketDetails.timeframe + ' ' + marketDetails.exchange,
       type: 'Candles',
       data: data,
       settings: {

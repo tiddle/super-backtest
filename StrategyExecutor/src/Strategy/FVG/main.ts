@@ -42,7 +42,6 @@ export function init({
   const lineA = SMA(300, df, 'lineA');
   const FVGData = FVG(df, 'FVG');
 
-  console.log(FVGData.filter((v) => v > 0));
   return df;
 }
 

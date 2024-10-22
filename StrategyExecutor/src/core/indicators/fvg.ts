@@ -6,19 +6,34 @@ export function FVG(df: DataFrame, columnName: string) {
   // Fair Value Gap
   const name = columnName || 'FVG';
 
-
-  const FVG = [
-    ...new Array(2),
+  const FVG = calculateOpen(df);
+  const FVGHigh = [
+    ...new Array(1),
+    ...FVG.map(c => c.high)
   ];
 
-  const pp = calculateOpen(df);
-  console.log(pp);
+  const FVGLow = [
+    ...new Array(1),
+    ...FVG.map(c => c.low)
+  ];
+
+  const FVGClose = [
+    ...new Array(1),
+    ...FVG.map(c => c.close)
+  ];
+
+  const FVGType = [
+    ...new Array(1),
+    ...FVG.map(c => c.type)
+  ];
 
 
-  df.addColumn(name, FVG, { inplace: true });
+  df.addColumn(name + 'Low', FVGLow, { inplace: true });
+  df.addColumn(name + 'High', FVGHigh, { inplace: true });
+  df.addColumn(name + 'Type', FVGType, { inplace: true });
+  df.addColumn(name + 'Close', FVGClose, { inplace: true });
 
   return FVG;
-
 }
 
 function calculateOpen(df: DataFrame): FVGData[] {
@@ -38,21 +53,26 @@ function calculateOpen(df: DataFrame): FVGData[] {
     // Green
     if (currentCandle.Open < currentCandle.Close) {
       if ((currentCandle.Low - firstCandle.High) > 0 && secondCandle.Open < secondCandle.Close) {
-        result = {
-          low: currentCandle.Low,
-          high: firstCandle.High,
-          type: 1
+        if (currentCandle.Low - firstCandle.High > currentCandle.Low * 0.005) {
+          output[i - 2] = {
+            low: currentCandle.Low,
+            high: firstCandle.High,
+            type: 1
+          }
         }
       }
     }
 
+
     // Red
     if (currentCandle.Open > currentCandle.Close) {
       if ((firstCandle.Low - currentCandle.High) > 0 && secondCandle.Open > secondCandle.Close) {
-        result = {
-          low: currentCandle.High,
-          high: firstCandle.Low,
-          type: -1
+        if (firstCandle.High - currentCandle.High > currentCandle.Low * 0.005) {
+          output[i - 2] = {
+            low: currentCandle.High,
+            high: firstCandle.Low,
+            type: -1
+          }
         }
       }
     }

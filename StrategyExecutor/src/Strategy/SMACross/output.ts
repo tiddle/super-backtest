@@ -16,6 +16,9 @@ export async function createOutputFiles(
 
   OHLCV.forEach((curr) => {
     if (Array.isArray(curr)) {
+      curr[8] = curr[8] ? 1 : 0;
+      curr[9] = curr[9] ? 1 : 0;
+
       if (curr[8]) {
         Cross.push([curr[0] as number, curr[2] as number, 1]);
       }

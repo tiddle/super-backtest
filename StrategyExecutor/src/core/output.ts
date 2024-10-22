@@ -37,8 +37,6 @@ export function createOHLCV(df: DataFrame): number[][] {
     if (Array.isArray(curr)) {
       const arrayCurr = curr as (string | number)[];
       arrayCurr[0] = parseISO(arrayCurr[0] as string).getTime();
-      arrayCurr[8] = arrayCurr[8] ? 1 : 0;
-      arrayCurr[9] = arrayCurr[9] ? 1 : 0;
       return arrayCurr as number[];
     }
 

@@ -6,7 +6,7 @@ import TradesData from '../../../data/FVG/trades.json'
 import SMA from '../../../data/FVG/sma.json';
 import FVG from '../../../data/FVG/fvg.json';
 import Trades from '../nv-scripts/trades.navy';
-import CenterDots from '../nv-scripts/center-dot.navy';
+import FVGVisual from '../nv-scripts/fvg.navy';
 
 document.querySelector('#app').innerHTML = `
 <style>
@@ -20,7 +20,7 @@ body {
 let chart = new NightVision('sma-cross-chart-container', {
   width: '1280',
   height: '600',
-  scripts: [CenterDots, Trades]
+  scripts: [FVGVisual, Trades]
 });
 
 const SMAConfig = {
@@ -37,13 +37,10 @@ const SMAConfig = {
 
 const FVGConfig = {
   name: 'FVG',
-  type: 'CenterDots',
+  type: 'FVG',
   data: FVG,
   settings: {
     precision: 4
-  },
-  props: {
-    color: 'red'
   }
 };
 

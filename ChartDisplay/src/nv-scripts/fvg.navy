@@ -1,0 +1,33 @@
+// Navy ~ 0.1-lite
+// ^^^ First comment should provide a NavyJS version
+
+// Meta tag
+[OVERLAY name=FVG, ctx=Canvas, author=Carlo, version=1.0.0]
+
+// Define new props
+// (the same as in 'settings.props' of Overlay object)
+prop('radius', {  type: 'number', def: 2 })
+
+// Draw function (called on each update)
+// Library provides a lot of useful variables to make
+// overlays ($core in the main collection)
+draw(ctx) {
+    const layout = $core.layout
+    const data = $core.data // Full dataset
+    const view = $core.view // Visible view
+
+    for (var i = view.i1, n = view.i2; i <= n; i++) {
+        const p = data[i]
+        // Mapping function used to transform values into
+        // coordinates
+        let x = layout.time2x(p[0])
+        let y = p[3] === 1 ? layout.value2y(p[1]) : layout.value2y(p[2]);
+        ctx.fillStyle = p[3] === 1 ? 'rgba(0, 255, 0, .5)' : 'rgba(255, 0, 0, .5)';
+        const height = p[3] === 1 ? layout.value2y(p[2]) - y : layout.value2y(p[1]) - y;
+        const width = layout.time2x(p[4]);
+        ctx.fillRect(x, y, 60, height);
+    }
+}
+
+yRange() => null;
+

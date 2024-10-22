@@ -62,3 +62,10 @@ export const SHORT = 'short';
 export const LONG = 'long'
 const PurchaseValues = [SHORT, LONG];
 export type PurchaseType = typeof PurchaseValues[number];
+
+export interface FVGData {
+  high: number,
+  low: number,
+  close?: number,
+  type: number
+}

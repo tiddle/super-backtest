@@ -5,16 +5,18 @@ import {
   differenceInHours,
 } from 'npm:date-fns';
 
-import {
-  type Order,
-  type Trade,
-  type Candle,
-  type CreateOrderFunction,
-  type DynamicTradingFunction,
-  type initParams,
-  LONG,
-  SHORT,
+import type {
+  Order,
+  Trade,
+  Candle,
+  CreateOrderFunction,
+  DynamicTradingFunction,
+  initParams,
 } from '../../types.ts';
+
+import { LONG, SHORT } from '../../types.ts';
+
+import { processExitConditions, createTrade } from '../../core/trades.ts';
 
 import { barCrossDown, barCrossUp } from './util.ts';
 import { SMA } from '../../core/indicators/sma.ts';
@@ -145,49 +147,3 @@ function processTrades(candle: Candle, candleRow: number, df: DataFrame) {
   });
 }
 
-export function createTrade(order: Order, candle: Candle, candleRow: number) {
-  return {
-    ...order,
-    price: order.price === 0 ? candle['Open'] : order.price,
-    entryCandle: candle,
-    entryCandleRow: candleRow,
-    orderDuration: order.duration,
-    duration: 0,
-  };
-}
-
-function processExitConditions(candle: Candle, trade: Trade) {
-  const stopLoss = trade.exitConditions?.stopLoss ?? 0;
-  const takeProfit = trade.exitConditions?.takeProfit ?? 0;
-  const duration = trade.exitConditions?.duration ?? 0;
-
-  if (trade.type === 'long') {
-    if (stopLoss && stopLoss > candle.Low) {
-      return stopLoss;
-    }
-
-    if (takeProfit && takeProfit < candle.High) {
-      return takeProfit;
-    }
-
-    if (duration && trade.duration > duration) {
-      return candle.Close;
-    }
-  }
-
-  if (trade.type === 'short') {
-    if (stopLoss && stopLoss < candle.Low) {
-      return stopLoss;
-    }
-
-    if (takeProfit && takeProfit > candle.High) {
-      return takeProfit;
-    }
-
-    if (duration && trade.duration > duration) {
-      return candle.Close;
-    }
-  }
-
-  return;
-}

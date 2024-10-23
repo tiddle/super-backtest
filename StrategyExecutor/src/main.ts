@@ -5,8 +5,8 @@ import {
   add
 } from 'npm:date-fns';
 
-import { init, iterator } from './Strategy/SMACross/main.ts';
-import { createOutputFiles } from './Strategy/SMACross/output.ts';
+import { init, iterator } from './Strategy/FVG/main.ts';
+import { createOutputFiles } from './Strategy/FVG/output.ts';
 import { createOrder, dynamicTrading } from './PurchaseStrategy/Basic/main.ts';
 import type { initParams, marketDetails } from './types.ts';
 
@@ -31,7 +31,7 @@ df['DateTime'] = df['DateTime'].map((d: number) => formatISO(new Date(d)));
 const bank = 1000000;
 
 const params: initParams = {
-  name: 'SMA Cross',
+  name: 'FVG',
   df,
   createOrderFunc: createOrder,
   dynamicTradingFunc: dynamicTrading,

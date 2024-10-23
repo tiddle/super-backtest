@@ -50,29 +50,22 @@ function calculateOpen(df: DataFrame): FVGData[] {
     const preCandle: Candle = (toJSON(preCandleRow) as Candle[])[0];
     let result: FVGData = { high: 0, low: 0, type: 0 };
 
-    // Green
-    if (currentCandle.Open < currentCandle.Close) {
-      if ((currentCandle.Low - firstCandle.High) > 0 && secondCandle.Open < secondCandle.Close) {
-        if (currentCandle.Low - firstCandle.High > currentCandle.Low * 0.005) {
-          output[i - 2] = {
-            low: currentCandle.Low,
-            high: firstCandle.High,
-            type: 1
-          }
+    if ((currentCandle.Low - firstCandle.High) > 0 && secondCandle.Open < secondCandle.Close) {
+      if (currentCandle.Low - firstCandle.High > currentCandle.Low * 0.008) {
+        output[i - 2] = {
+          low: currentCandle.Low,
+          high: firstCandle.High,
+          type: 1
         }
       }
     }
 
-
-    // Red
-    if (currentCandle.Open > currentCandle.Close) {
-      if ((firstCandle.Low - currentCandle.High) > 0 && secondCandle.Open > secondCandle.Close) {
-        if (firstCandle.High - currentCandle.High > currentCandle.Low * 0.005) {
-          output[i - 2] = {
-            low: currentCandle.High,
-            high: firstCandle.Low,
-            type: -1
-          }
+    if ((firstCandle.Low - currentCandle.High) > 0 && secondCandle.Open > secondCandle.Close) {
+      if (firstCandle.High - currentCandle.High > currentCandle.Low * 0.008) {
+        output[i - 2] = {
+          low: currentCandle.High,
+          high: firstCandle.Low,
+          type: -1
         }
       }
     }

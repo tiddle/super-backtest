@@ -31,3 +31,4 @@ draw(ctx) {
 
 yRange() => null;
 
+legend() => 'FVG';

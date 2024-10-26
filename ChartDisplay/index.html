@@ -4,9 +4,34 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Chart Display</title>
+		<style>
+			body,
+			html {
+				background-color: #0c0d0e;
+			}
+
+			h1 {
+				color: #eee;
+			}
+
+			#menu {
+				clear: both;
+			}
+
+			#menu ul {
+				display: block;
+				list-style: none;
+				text-align: center;
+			}
+
+			#menu li {
+				display: inline-block;
+			}
+		</style>
 	</head>
 	<body>
+		<div id="menu"></div>
 		<div id="app"></div>
-		<script type="module" src="/src/fvg/main.js"></script>
+		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>

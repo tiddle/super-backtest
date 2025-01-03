@@ -32,7 +32,6 @@ const bank = 1000000;
 
 const params: initParams = {
   name: 'FVG',
-  df,
   createOrderFunc: createOrder,
   dynamicTradingFunc: dynamicTrading,
   bankParam: bank,
@@ -44,8 +43,8 @@ const marketDetails: marketDetails = {
   timeframe
 }
 
-const dfIndicators = init(params);
-const completedTrades = iterator(dfIndicators);
+const dfIndicators = init(params, df);
+const { completedTrades } = iterator(dfIndicators);
 
 await createOutputFiles(df, completedTrades, params.name, marketDetails);
 

@@ -30,7 +30,6 @@ export async function createOutputFiles(
       }
     }
   });
-  console.log(FVG);
 
   const tradeDetailsArr = tradeDetails(completedTrades);
   const statsDF = statsOutput(tradeDetailsArr, OHLCV, df, name);

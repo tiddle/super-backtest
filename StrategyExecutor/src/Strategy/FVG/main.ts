@@ -6,8 +6,6 @@ import {
 } from 'npm:date-fns';
 
 import type {
-  Order,
-  Trade,
   Candle,
   CreateOrderFunction,
   DynamicTradingFunction,
@@ -17,7 +15,7 @@ import type {
 
 import { LONG, SHORT } from '../../types.ts';
 
-import { processExitConditions } from '../../core/trades.ts';
+import { processExitConditions, createTrade } from '../../core/trades.ts';
 
 import { SMA } from '../../core/indicators/sma.ts';
 import { FVG } from '../../core/indicators/fvg.ts';
@@ -36,9 +34,12 @@ export function init({
   createOrderFunc,
   bankParam,
   dynamicTradingFunc,
-}: initParams, df) {
-  createOrder = createOrderFunc;
+}: initParams, df: DataFrame) {
   state.bank = bankParam;
+
+  if (createOrderFunc) {
+    createOrder = createOrderFunc;
+  }
 
   if (dynamicTradingFunc) {
     dynamicTrading = dynamicTradingFunc;
@@ -98,7 +99,7 @@ function processOrders(candle: Candle, candleRow: number, state: orderState): or
 
   });
 
-  return { ...myState };
+  return myState;
 }
 
 function processTrades(candle: Candle, candleRow: number, df: DataFrame, state: orderState): orderState {
@@ -138,7 +139,7 @@ function processTrades(candle: Candle, candleRow: number, df: DataFrame, state: 
           parseISO(trade.entryCandle.DateTime)
         ),
       });
-      myState.trades.splice(trades.indexOf(trade), 1);
+      myState.trades.splice(myState.trades.indexOf(trade), 1);
     }
   });
 

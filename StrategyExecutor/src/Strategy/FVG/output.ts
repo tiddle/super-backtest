@@ -20,9 +20,6 @@ export async function createOutputFiles(
         SMA.push([curr[0] as number, curr[6] as number]);
       }
 
-      if (curr[9] === -1) {
-        console.log(curr);
-      }
       // 7 Low, 8 High, 9 Type, 10 Close
       if (curr[7]) {
         const close = parseISO(curr[10] as string).getTime();

@@ -75,3 +75,12 @@ export interface FVGData {
   close?: number,
   type: number
 }
+
+export interface Purchases {
+  orders: Order[],
+  trades: Trade[],
+  completedTrades: Trade[],
+  bank: number,
+  createOrder?: CreateOrderFunction
+  dynamicTrading?: DynamicTradingFunction
+}

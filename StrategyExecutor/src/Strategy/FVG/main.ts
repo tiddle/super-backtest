@@ -6,36 +6,40 @@ import {
 } from 'npm:date-fns';
 
 import type {
-  Order,
-  Trade,
   Candle,
   CreateOrderFunction,
   DynamicTradingFunction,
-  initParams
+  initParams,
+  orderState
 } from '../../types.ts';
 
 import { LONG, SHORT } from '../../types.ts';
 
-import { processExitConditions } from '../../core/trades.ts';
+import { processExitConditions, createTrade } from '../../core/trades.ts';
 
 import { SMA } from '../../core/indicators/sma.ts';
 import { FVG } from '../../core/indicators/fvg.ts';
 
-const orders: Order[] = [];
-const trades: Trade[] = [];
-const completedTrades: Trade[] = [];
 let createOrder: CreateOrderFunction;
 let dynamicTrading: DynamicTradingFunction;
-let bank = -1;
+
+let state: orderState = {
+  orders: [],
+  trades: [],
+  completedTrades: [],
+  bank: -1
+}
 
 export function init({
   createOrderFunc,
-  df,
   bankParam,
   dynamicTradingFunc,
-}: initParams) {
-  createOrder = createOrderFunc;
-  bank = bankParam;
+}: initParams, df: DataFrame) {
+  state.bank = bankParam;
+
+  if (createOrderFunc) {
+    createOrder = createOrderFunc;
+  }
 
   if (dynamicTradingFunc) {
     dynamicTrading = dynamicTradingFunc;
@@ -47,63 +51,67 @@ export function init({
   return df;
 }
 
-export function iterator(df: DataFrame) {
+export function iterator(df: DataFrame): orderState {
   for (let i = 0; i < df.index.length; i++) {
     const row = df.iloc({ rows: [i] });
     const candle: Candle = (toJSON(row) as Candle[])[0];
 
-    processTrades(candle, i, df);
-    processOrders(candle, i, bank);
+    state = processTrades(candle, i, df, state);
+    state = processOrders(candle, i, state);
     checkForSignals(candle, df);
   }
 
-  return completedTrades;
+  return state;
 }
 
 function checkForSignals(_candle: Candle, _df: DataFrame) {
   return;
 }
 
-function processOrders(candle: Candle, candleRow: number, bankParam: number) {
-  orders.forEach((order) => {
-    order.duration++;
+function processOrders(candle: Candle, candleRow: number, state: orderState): orderState {
+  const myState = { ...state };
 
-    if (candle.Open < bankParam) {
+  state.orders.forEach((order) => {
+    if (candle.Open < myState.bank) {
       if (order.price === 0) {
-        bank -= candle.Open;
-        trades.push(createTrade(order, candle, candleRow));
-        orders.splice(orders.indexOf(order), 1);
+        myState.bank -= candle.Open;
+        myState.trades.push(createTrade(order, candle, candleRow));
+        myState.orders.splice(myState.orders.indexOf(order), 1);
         return;
       }
 
       if (order.type === LONG) {
         if (order.price < candle.High) {
-          bank -= candle.Open;
-          trades.push(createTrade(order, candle, candleRow));
-          orders.splice(orders.indexOf(order), 1);
+          myState.bank -= candle.Open;
+          myState.trades.push(createTrade(order, candle, candleRow));
+          myState.orders.splice(myState.orders.indexOf(order), 1);
         }
       }
 
       if (order.type === SHORT) {
         if (order.price > candle.High) {
-          bank -= candle.Open;
-          trades.push(createTrade(order, candle, candleRow));
-          orders.splice(orders.indexOf(order), 1);
+          myState.bank -= candle.Open;
+          myState.trades.push(createTrade(order, candle, candleRow));
+          myState.orders.splice(myState.orders.indexOf(order), 1);
         }
       }
     }
+
   });
+
+  return myState;
 }
 
-function processTrades(candle: Candle, candleRow: number, df: DataFrame) {
-  trades.forEach((trade) => {
-    trade.duration++;
+function processTrades(candle: Candle, candleRow: number, df: DataFrame, state: orderState): orderState {
+  const myState = { ...state };
 
+  state.trades.forEach((trade, i) => {
     const exitPrice = processExitConditions(candle, trade);
 
     if (!exitPrice && dynamicTrading) {
-      trades.splice(trades.indexOf(trade), 1);
-      trades.push(dynamicTrading(trade, candle, candleRow, df));
+      // Remove and potentially adjust stop loss
+      myState.trades.splice(state.trades.indexOf(trade), 1);
+      myState.trades.push(dynamicTrading(trade, candle, candleRow, df));
       return;
     }
 
@@ -114,9 +122,9 @@ function processTrades(candle: Candle, candleRow: number, df: DataFrame) {
         profit = -profit;
       }
 
-      bank += exitPrice * trade.size;
+      myState.bank += exitPrice * trade.size;
 
-      completedTrades.push({
+      myState.completedTrades.push({
         ...trade,
         exitPrice: exitPrice,
         exitCandle: candle,
@@ -131,19 +139,10 @@ function processTrades(candle: Candle, candleRow: number, df: DataFrame) {
           parseISO(trade.entryCandle.DateTime)
         ),
       });
-      trades.splice(trades.indexOf(trade), 1);
+      myState.trades.splice(myState.trades.indexOf(trade), 1);
     }
   });
-}
 
-export function createTrade(order: Order, candle: Candle, candleRow: number) {
-  return {
-    ...order,
-    price: order.price === 0 ? candle['Open'] : order.price,
-    entryCandle: candle,
-    entryCandleRow: candleRow,
-    orderDuration: order.duration,
-    duration: 0,
-  };
+  return myState;
 }
 

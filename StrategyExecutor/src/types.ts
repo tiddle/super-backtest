@@ -44,7 +44,13 @@ export interface initParams {
   createOrderFunc: CreateOrderFunction;
   dynamicTradingFunc?: DynamicTradingFunction;
   bankParam: number;
-  df: DataFrame;
+}
+
+export interface orderState {
+  trades: Trade[];
+  completedTrades: Trade[];
+  orders: Order[];
+  bank: number;
 }
 
 export interface marketDetails {
@@ -68,4 +74,13 @@ export interface FVGData {
   low: number,
   close?: number,
   type: number
+}
+
+export interface Purchases {
+  orders: Order[],
+  trades: Trade[],
+  completedTrades: Trade[],
+  bank: number,
+  createOrder?: CreateOrderFunction
+  dynamicTrading?: DynamicTradingFunction
 }

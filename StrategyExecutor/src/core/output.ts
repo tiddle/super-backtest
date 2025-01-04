@@ -80,6 +80,9 @@ export function statsOutput(
   );
   const candleCount = OHLCV.length;
 
+  const winTradeAmount = tradesDF.query(tradesDF['Profit'].gt(0)).index.length;
+  const losingTradeAmount = tradesDF.query(tradesDF['Profit'].lt(0)).index.length;
+
   const exposureTime = computeExposureTime(OHLCV.length, tradesDF);
   const buyAndHoldReturn = computeReturnPct(df['Close']);
   const maxTradeDuration = tradeAmount ? Math.ceil(durations.max()) : NaN;
@@ -103,6 +106,8 @@ export function statsOutput(
       winRate.toFixed(3),
       bestTrade.toFixed(3),
       worstTrade.toFixed(3),
+      winTradeAmount,
+      losingTradeAmount,
       tradeAmount,
       profitLoss.toFixed(3),
     ],
@@ -120,6 +125,8 @@ export function statsOutput(
         'WinRate',
         'BestTrade',
         'WorstTrade',
+        'Amount of winning trades',
+        'Amount of losing trades',
         'Amount of trades',
         'Profit/Loss',
       ],

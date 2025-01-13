@@ -1,15 +1,19 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame, Series } from 'npm:nodejs-polars';
 import { SMA as SMACalc } from 'npm:technicalindicators';
 
 export function SMA(period = 30, df: DataFrame, columnName: string) {
-  const name = columnName || 'SMA' + period;
+	const name = columnName || 'SMA' + period;
 
-  const lineA = [
-    ...new Array(period - 1),
-    ...SMACalc.calculate({ period: period, values: df['Close'].values }),
-  ];
+	const filler = new Array(period - 1);
 
-  df.addColumn(name, lineA, { inplace: true });
+	const closeValues = df.getColumn('Close').toArray();
 
-  return lineA;
+	const lineA = [
+		...filler.fill(0),
+		...SMACalc.calculate({ period: period, values: closeValues }),
+	];
+
+	const lineASeries = Series(name, lineA);
+
+	return df.withColumn(lineASeries);
 }

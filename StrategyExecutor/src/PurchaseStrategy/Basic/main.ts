@@ -1,4 +1,4 @@
-import { DataFrame, toJSON } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 import type { Candle, Order, PurchaseType, Trade } from '../../types.ts';
 
 export function createOrder(
@@ -32,9 +32,10 @@ export function dynamicTrading(
 	df: DataFrame
 ): Trade {
 	// Move stop loss to previous candle low if higher
+	// No -1 as it's 0 based index
 
-	const row = df.iloc({ rows: [candleRow - 1] });
-	const previousCandleData: Candle = (toJSON(row) as Candle[])[0];
+	const candles = df.toRecords();
+	const previousCandleData: Candle = candles[candleRow];
 	const previousCandleLow = previousCandleData.Low;
 	const previousCandleHigh = previousCandleData.High;
 

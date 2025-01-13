@@ -1,11 +1,11 @@
-import { DataFrame, toJSON } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 
 import type {
-  Candle,
-  CreateOrderFunction,
-  DynamicTradingFunction,
-  initParams,
-  orderState
+	Candle,
+	CreateOrderFunction,
+	DynamicTradingFunction,
+	initParams,
+	orderState
 } from '../../types.ts';
 
 import { processOrders, processTrades } from '../../core/trades.ts';
@@ -17,47 +17,48 @@ let createOrder: CreateOrderFunction;
 let dynamicTrading: DynamicTradingFunction;
 
 let state: orderState = {
-  orders: [],
-  trades: [],
-  completedTrades: [],
-  bank: -1
+	orders: [],
+	trades: [],
+	completedTrades: [],
+	bank: -1
 }
 
 export function init({
-  createOrderFunc,
-  bankParam,
-  dynamicTradingFunc,
+	createOrderFunc,
+	bankParam,
+	dynamicTradingFunc,
 }: initParams, df: DataFrame) {
-  state.bank = bankParam;
+	let localDf: DataFrame;
 
-  if (createOrderFunc) {
-    createOrder = createOrderFunc;
-  }
+	state.bank = bankParam;
 
-  if (dynamicTradingFunc) {
-    dynamicTrading = dynamicTradingFunc;
-  }
+	if (createOrderFunc) {
+		createOrder = createOrderFunc;
+	}
 
-  const lineA = SMA(300, df, 'lineA');
-  const FVGData = FVG(df, 'FVG');
+	if (dynamicTradingFunc) {
+		dynamicTrading = dynamicTradingFunc;
+	}
 
-  return df;
+	localDf = SMA(300, df, 'lineA');
+	localDf = FVG(localDf, 'FVG');
+
+	return localDf;
 }
 
 export function iterator(df: DataFrame): orderState {
-  for (let i = 0; i < df.index.length; i++) {
-    const row = df.iloc({ rows: [i] });
-    const candle: Candle = (toJSON(row) as Candle[])[0];
+	const candles = df.toRecords();
 
-    state = processTrades(candle, i, df, state, dynamicTrading);
-    state = processOrders(candle, i, state);
-    state = checkForSignals(candle, df, state);
-  }
+	candles.forEach((candle: Candle, i: number) => {
+		state = processTrades(candle, df, i, state);
+		state = processOrders(candle, i, state);
+		state = checkForSignals(candle, df, state);
+	});
 
-  return state;
+	return state;
 }
 
 function checkForSignals(_candle: Candle, _df: DataFrame, state: orderState): orderState {
-  return state;
+	return state;
 }
 

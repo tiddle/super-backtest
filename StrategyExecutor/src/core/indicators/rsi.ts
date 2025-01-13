@@ -1,16 +1,20 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame, Series } from 'npm:nodejs-polars';
 import { RSI as RSICalc } from 'npm:technicalindicators';
 
 export function RSI(period = 30, df: DataFrame, columnName: string) {
-  const name = columnName || 'RSI' + period;
+	const name = columnName || 'RSI' + period;
 
-  const RSILine = [
-    ...new Array(period - 1),
-    ...RSICalc.calculate({ period: period, values: df['Close'].values }),
-  ];
+	const filler = new Array(period - 1);
 
-  df.addColumn(name, RSILine, { inplace: true });
+	const closeValues = df.getColumn('Close').toArray();
 
-  return RSILine;
+	const RSILine = [
+		...filler.fill(0),
+		...RSICalc.calculate({ period: period, values: closeValues }),
+	];
+
+	const RSILineSeries = Series(name, RSILine);
+
+	return df.withColumn(RSILineSeries);
 
 }

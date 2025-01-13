@@ -1,67 +1,76 @@
-import { DataFrame } from "npm:danfojs-node";
+import { DataFrame } from 'npm:nodejs-polars';
 
 export interface Order {
-  size: number;
-  price: number;
-  duration: number;
-  type: PurchaseType;
-  exitConditions?: ExitConditions;
+	size: number;
+	price: number;
+	duration: number;
+	type: PurchaseType;
+	exitConditions?: ExitConditions;
 }
 
 export interface Trade extends Order {
-  entryCandle: Candle;
-  entryCandleRow: number;
-  orderDuration: number;
-  exitPrice?: number;
-  exitCandle?: Candle;
-  exitCandleRow?: number;
-  profit?: number;
-  durationInHours?: number;
+	entryCandle: Candle;
+	entryCandleRow: number;
+	orderDuration: number;
+	exitPrice?: number;
+	exitCandle?: Candle;
+	exitCandleRow?: number;
+	profit?: number;
+	durationInHours?: number;
 }
 
 export interface ExitConditions {
-  stopLoss?: number;
-  takeProfit?: number;
-  duration?: number;
+	stopLoss?: number;
+	takeProfit?: number;
+	duration?: number;
 }
 
 export interface Candle {
-  DateTime: string;
-  Open: number;
-  High: number;
-  Low: number;
-  Close: number;
-  CrossUp: boolean;
-  CrossDown: boolean;
+	DateTime: string;
+	Open: number;
+	High: number;
+	Low: number;
+	Close: number;
+	CrossUp: boolean;
+	CrossDown: boolean;
 }
 
 export type CreateOrderFunction = (price: number, type: PurchaseType, candle: Candle, df: DataFrame) => Order;
 export type ExitConditionsFunction = (exitConditions: ExitConditions, candle: Candle, trade: Trade, df: DataFrame) => number | undefined;
 export type DynamicTradingFunction = (trade: Trade, candle: Candle, candleRow: number, df: DataFrame) => Trade;
+export type initFunction = (initParams: initParams, df: DataFrame) => DataFrame;
+export type iteratorFunction = (df: DataFrame) => orderState;
+export type createOutputFunction = (df: DataFrame, completedTrades: Trade[], name: string, marketDetails: marketDetails) => void;
 
 export interface initParams {
-  name: string;
-  createOrderFunc: CreateOrderFunction;
-  dynamicTradingFunc?: DynamicTradingFunction;
-  bankParam: number;
+	name: string;
+	createOrderFunc: CreateOrderFunction;
+	dynamicTradingFunc?: DynamicTradingFunction;
+	bankParam: number;
+}
+
+export interface strategyParams extends initParams {
+	initFunc: initFunction,
+	iteratorFunc: iteratorFunction,
+	createOutputFunc: createOutputFunction
 }
 
 export interface orderState {
-  trades: Trade[];
-  completedTrades: Trade[];
-  orders: Order[];
-  bank: number;
+	trades: Trade[];
+	completedTrades: Trade[];
+	orders: Order[];
+	bank: number;
 }
 
 export interface marketDetails {
-  symbol: string;
-  exchange: string;
-  timeframe: string;
+	symbol: string;
+	exchange: string;
+	timeframe: string;
 }
 
 export interface FileData {
-  name: string;
-  data: number[][] | marketDetails;
+	name: string;
+	data: number[][] | marketDetails;
 }
 
 export const SHORT = 'short';
@@ -70,17 +79,17 @@ const PurchaseValues = [SHORT, LONG];
 export type PurchaseType = typeof PurchaseValues[number];
 
 export interface FVGData {
-  high: number,
-  low: number,
-  close?: number,
-  type: number
+	high: number,
+	low: number,
+	close?: number,
+	type: number
 }
 
 export interface Purchases {
-  orders: Order[],
-  trades: Trade[],
-  completedTrades: Trade[],
-  bank: number,
-  createOrder?: CreateOrderFunction
-  dynamicTrading?: DynamicTradingFunction
+	orders: Order[],
+	trades: Trade[],
+	completedTrades: Trade[],
+	bank: number,
+	createOrder?: CreateOrderFunction
+	dynamicTrading?: DynamicTradingFunction
 }

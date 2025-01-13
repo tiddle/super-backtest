@@ -1,4 +1,4 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 import {
   parseISO,
   differenceInDays,
@@ -99,7 +99,6 @@ export function processOrders(candle: Candle, candleRow: number, state: orderSta
 
 export function processTrades(candle: Candle, candleRow: number, df: DataFrame, state: orderState, dynamicTrading?: DynamicTradingFunction): orderState {
   const myState = { ...state };
-
   myState.trades.forEach((trade, i) => {
     myState.trades[i].duration++;
 

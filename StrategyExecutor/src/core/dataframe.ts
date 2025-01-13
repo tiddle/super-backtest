@@ -1,15 +1,19 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 import {
-  formatISO,
+	formatISO,
 } from 'npm:date-fns';
 
 
 export function createDataFrame(historyCandlesDF: any) {
-  const df = new DataFrame(historyCandlesDF, {
-    columns: ['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume'],
-  });
+	const candles = historyCandlesDF.map((row) => {
+		const output = [...row];
+		output[0] = formatISO(new Date(row[0]));
 
-  df['DateTime'] = df['DateTime'].map((d: number) => formatISO(new Date(d)));
+		return output;
+	});
+	const df = new DataFrame(candles, {
+		columns: ['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume'],
+	});
 
-  return df;
+	return df;
 }

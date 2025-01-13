@@ -1,11 +1,12 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 
 export function barCrossUp(
-	lineA: number[],
 	df: DataFrame,
 ): number[] {
-	const close = df['Close'].values;
-	const open = df['Open'].values;
+	const close = df.getColumn('Close').toArray();
+	const open = df.getColumn('Open').toArray();
+	const lineA = df.getColumn('SMA').toArray();
+
 
 	return close.reduce((acc: number[], curr: number, i: number) => {
 		if (!lineA[i]) {
@@ -13,7 +14,7 @@ export function barCrossUp(
 			return acc;
 		}
 
-		if (curr > open[i] && curr > lineA[i] && open[i] < lineA[i] && open[i-1] < close[i-1] && acc[i-1] !== 1) {
+		if (curr > open[i] && curr > lineA[i] && open[i] < lineA[i] && open[i - 1] < close[i - 1] && acc[i - 1] !== 1) {
 			acc[i] = 1;
 		} else {
 			acc[i] = 0;
@@ -24,11 +25,11 @@ export function barCrossUp(
 }
 
 export function barCrossDown(
-	lineA: number[],
 	df: DataFrame,
 ): number[] {
-	const close = df['Close'].values;
-	const open = df['Open'].values;
+	const close = df.getColumn('Close').toArray();
+	const open = df.getColumn('Open').toArray();
+	const lineA = df.getColumn('SMA').toArray();
 
 	return close.reduce((acc: number[], curr: number, i: number) => {
 		if (!lineA[i]) {
@@ -36,7 +37,7 @@ export function barCrossDown(
 			return acc;
 		}
 
-		if (curr < open[i] && curr < lineA[i] && open[i] > lineA[i] && open[i-1] > close[i-1] && acc[i-1] !== 1) {
+		if (curr < open[i] && curr < lineA[i] && open[i] > lineA[i] && open[i - 1] > close[i - 1] && acc[i - 1] !== 1) {
 			acc[i] = 1;
 		} else {
 			acc[i] = 0;

@@ -1,4 +1,4 @@
-import { DataFrame, Series } from "npm:nodejs-polars";
+import { DataFrame, Series } from 'npm:nodejs-polars';
 import { SMA as SMACalc } from 'npm:technicalindicators';
 
 export function SMA(period = 30, df: DataFrame, columnName: string) {

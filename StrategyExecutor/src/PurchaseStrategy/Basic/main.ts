@@ -1,4 +1,4 @@
-import { DataFrame } from "npm:nodejs-polars";
+import { DataFrame } from 'npm:nodejs-polars';
 import type { Candle, Order, PurchaseType, Trade } from '../../types.ts';
 
 export function createOrder(

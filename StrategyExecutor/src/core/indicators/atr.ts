@@ -1,4 +1,4 @@
-import { DataFrame, Series, col } from "npm:nodejs-polars";
+import { DataFrame, Series, col } from 'npm:nodejs-polars';
 import { ATR as ATRCalc } from 'npm:technicalindicators';
 
 export function ATR(period = 14, df: DataFrame, columnName: string) {

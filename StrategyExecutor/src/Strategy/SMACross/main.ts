@@ -1,4 +1,4 @@
-import { DataFrame, Series } from "npm:nodejs-polars";
+import { DataFrame, Series } from 'npm:nodejs-polars';
 
 import type {
   Candle,
@@ -60,13 +60,13 @@ export function iterator(df: DataFrame) {
   candles.forEach((candle: Candle, i: number) => {
     purchases = processTrades(candle, df, i, purchases);
     purchases = processOrders(candle, i, purchases);
-    purchases = checkForSignals(candle, purchases, df);
+    purchases = checkForSignals(candle, df, purchases);
   });
 
   return purchases;
 }
 
-function checkForSignals(candle: Candle, purchases: orderState, df: DataFrame) {
+function checkForSignals(candle: Candle, df: DataFrame, purchases: orderState) {
   const myState = { ...purchases };
 
   if (candle['CrossUp']) {

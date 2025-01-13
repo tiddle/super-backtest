@@ -52,7 +52,7 @@ export function iterator(df: DataFrame): orderState {
   candles.forEach((candle: Candle, i: number) => {
     state = processTrades(candle, df, i, state);
     state = processOrders(candle, i, state);
-    state = checkForSignals(candle, state, df);
+    state = checkForSignals(candle, df, state);
   });
 
   return state;

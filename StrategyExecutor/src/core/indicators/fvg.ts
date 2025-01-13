@@ -1,4 +1,4 @@
-import { DataFrame, Series } from 'npm:nodejs-polars';
+import { DataFrame, Series, col } from 'npm:nodejs-polars';
 
 import { Candle, FVGData } from '../../types.ts';
 
@@ -33,14 +33,14 @@ export function FVG(df: DataFrame, columnName: string) {
   const FVGCloseSeries = Series(name + 'Close', FVGClose);
   const FVGTypeSeries = Series(name + 'Type', FVGType);
 
-  return df.withColumns([FVGHighSeries, FVGLowSeries, FVGCloseSeries, FVGTypeSeries]);
+  const output = df.withColumns([FVGHighSeries, FVGLowSeries, FVGCloseSeries, FVGTypeSeries]);
+
+  return output;
 }
 
 function calculateOpen(df: DataFrame): FVGData[] {
   let output: FVGData[] = [];
   const candles = df.toRecords();
-
-  console.log(candles[0]);
 
   for (let i = 2; i < candles.length; i++) {
     const currentCandle: Candle = candles[i];
@@ -52,7 +52,6 @@ function calculateOpen(df: DataFrame): FVGData[] {
 
     if ((currentCandle.Low - firstCandle.High) > 0 && secondCandle.Open < secondCandle.Close) {
       if (currentCandle.Low - firstCandle.High > currentCandle.Low * 0.008) {
-        console.log('in here');
         output[i - 2] = {
           low: currentCandle.Low,
           high: firstCandle.High,
@@ -63,7 +62,6 @@ function calculateOpen(df: DataFrame): FVGData[] {
 
     if ((firstCandle.Low - currentCandle.High) > 0 && secondCandle.Open > secondCandle.Close) {
       if (firstCandle.High - currentCandle.High > currentCandle.Low * 0.008) {
-        console.log('in later');
         output[i - 2] = {
           low: currentCandle.High,
           high: firstCandle.Low,
@@ -74,8 +72,6 @@ function calculateOpen(df: DataFrame): FVGData[] {
 
     output.push(result);
   }
-
-  console.log(output[0], output.length);
 
   return calculateClose(df, output);
 }
@@ -111,6 +107,6 @@ function calculateClose(df: DataFrame, fvgArr: FVGData[]): FVGData[] {
       }
     }
 
-    return { ...c, close: 0 };
+    return { ...c, close: '' };
   });
 }

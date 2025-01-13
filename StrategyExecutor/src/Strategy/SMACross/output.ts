@@ -40,8 +40,6 @@ export function createOutputFiles(
   const tradeDetailsArr = tradeDetails(completedTrades);
   const statsDF = statsOutput(tradeDetailsArr, OHLCV, df, name);
 
-  display(statsDF);
-
   createFiles(path, [{
     name: 'ohlcv',
     data: OHLCV
@@ -61,4 +59,6 @@ export function createOutputFiles(
     name: 'marketDetails',
     data: marketDetails
   }])
+
+  return statsDF;
 }

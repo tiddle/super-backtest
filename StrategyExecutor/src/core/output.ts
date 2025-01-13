@@ -57,26 +57,34 @@ export function statsOutput(
   df: DataFrame,
   name = ''
 ) {
+  const headings = [
+    'EntryTime',
+    'EntryPrice',
+    'ExitTime',
+    'ExitPrice',
+    'Type',
+    'EntryCandle',
+    'ExitCandle',
+    'Size',
+    'Profit',
+    'ProfitLossPercent',
+    'Duration',
+  ];
+
+  const filler = new Array(headings.length);
+  if (tradeOutput.length === 0) {
+    tradeOutput = [filler.fill(0)];
+  }
+
   const tradesDF = DataFrame(tradeOutput, {
-    columns: [
-      'EntryTime',
-      'EntryPrice',
-      'ExitTime',
-      'ExitPrice',
-      'Type',
-      'EntryCandle',
-      'ExitCandle',
-      'Size',
-      'Profit',
-      'ProfitLossPercent',
-      'Duration',
-    ],
+    columns: headings,
   });
 
   const pl = tradesDF.getColumn('Profit');
   const returns = tradesDF.getColumn('ProfitLossPercent');
   const durations = tradesDF.getColumn('Duration');
-  const tradeAmount = tradeOutput.length;
+  // Cater for empty array defaults
+  const tradeAmount = tradeOutput[0][0] === 0 ? 0 : tradeOutput.length;
 
   const start = formatISO(OHLCV[0][0]);
   const end = formatISO(OHLCV[OHLCV.length - 1][0]);
@@ -191,6 +199,10 @@ export async function createFiles(path = '', valArr: FileData[] = []) {
 }
 
 export function display(df: DataFrame) {
+  if (!df) {
+    return;
+  }
+
   const stats = Object.entries(df.toRecords()[0]).reduce((acc, curr) => {
     acc.push([...curr])
 

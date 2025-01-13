@@ -3,7 +3,7 @@ import { parseISO } from 'npm:date-fns/parseISO';
 import type { marketDetails, Trade } from '../../types.ts';
 import { createFiles, createOHLCV, statsOutput, tradeDetails } from '../../core/output.ts';
 
-export async function createOutputFiles(
+export function createOutputFiles(
   df: DataFrame,
   completedTrades: Trade[],
   name: string,
@@ -31,8 +31,6 @@ export async function createOutputFiles(
   const tradeDetailsArr = tradeDetails(completedTrades);
   const statsDF = statsOutput(tradeDetailsArr, OHLCV, df, name);
 
-  statsDF.print();
-
   createFiles(path, [{
     name: 'ohlcv',
     data: OHLCV
@@ -49,4 +47,6 @@ export async function createOutputFiles(
     name: 'marketDetails',
     data: marketDetails
   }])
+
+  return statsDF;
 }

@@ -1,4 +1,4 @@
-import { DataFrame, toJSON } from 'npm:danfojs-node';
+import { DataFrame, Series } from "npm:nodejs-polars";
 
 import type {
   Candle,
@@ -29,6 +29,7 @@ export function init({
   bankParam,
   dynamicTradingFunc,
 }: initParams, df: DataFrame) {
+  let localDf: DataFrame;
   purchases.bank = bankParam;
 
   if (createOrderFunc) {
@@ -39,32 +40,33 @@ export function init({
     dynamicTrading = dynamicTradingFunc;
   }
 
-  const lineA = SMA(300, df, 'lineA');
-  const atrLine = ATR(14, df, 'ATR');
+  localDf = SMA(300, df, 'SMA');
+  localDf = ATR(14, localDf, 'ATR');
 
-  const crossUpData = barCrossUp(lineA, df);
-  const crossDownData = barCrossDown(lineA, df);
+  const crossUpData = barCrossUp(localDf);
+  const crossDownData = barCrossDown(localDf);
 
-  df.addColumn('CrossUp', crossUpData, { inplace: true });
-  df.addColumn('CrossDown', crossDownData, { inplace: true });
+  const crossUpSeries = Series('CrossUp', crossUpData);
+  const crossDownSeries = Series('CrossDown', crossDownData);
 
-  return df;
+  localDf = localDf.withColumns([crossUpSeries, crossDownSeries]);
+
+  return localDf;
 }
 
 export function iterator(df: DataFrame) {
-  for (let i = 0; i < df.index.length; i++) {
-    const row = df.iloc({ rows: [i] });
-    const candle: Candle = (toJSON(row) as Candle[])[0];
+  const candles = df.toRecords();
 
-    purchases = processTrades(candle, i, df, purchases);
+  candles.forEach((candle: Candle, i: number) => {
+    purchases = processTrades(candle, df, i, purchases);
     purchases = processOrders(candle, i, purchases);
-    purchases = checkForSignals(candle, df, purchases);
-  }
+    purchases = checkForSignals(candle, purchases, df);
+  });
 
   return purchases;
 }
 
-function checkForSignals(candle: Candle, df: DataFrame, purchases: orderState) {
+function checkForSignals(candle: Candle, purchases: orderState, df: DataFrame) {
   const myState = { ...purchases };
 
   if (candle['CrossUp']) {

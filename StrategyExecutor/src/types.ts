@@ -1,4 +1,4 @@
-import { DataFrame } from "npm:danfojs-node";
+import { DataFrame } from "npm:nodejs-polars";
 
 export interface Order {
   size: number;
@@ -38,12 +38,21 @@ export interface Candle {
 export type CreateOrderFunction = (price: number, type: PurchaseType, candle: Candle, df: DataFrame) => Order;
 export type ExitConditionsFunction = (exitConditions: ExitConditions, candle: Candle, trade: Trade, df: DataFrame) => number | undefined;
 export type DynamicTradingFunction = (trade: Trade, candle: Candle, candleRow: number, df: DataFrame) => Trade;
+export type initFunction = (initParams: initParams, df: DataFrame) => DataFrame;
+export type iteratorFunction = (df: DataFrame) => orderState;
+export type createOutputFunction = (df: DataFrame, completedTrades: Trade[], name: string, marketDetails: marketDetails) => void;
 
 export interface initParams {
   name: string;
   createOrderFunc: CreateOrderFunction;
   dynamicTradingFunc?: DynamicTradingFunction;
   bankParam: number;
+}
+
+export interface strategyParams extends initParams {
+  initFunc: initFunction,
+  iteratorFunc: iteratorFunction,
+  createOutputFunc: createOutputFunction
 }
 
 export interface orderState {

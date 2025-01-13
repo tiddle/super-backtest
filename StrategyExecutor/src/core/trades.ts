@@ -65,34 +65,36 @@ export function createTrade(order: Order, candle: Candle, candleRow: number) {
 export function processOrders(candle: Candle, candleRow: number, state: orderState): orderState {
   const myState = { ...state };
 
-  myState.orders.forEach((order, i) => {
-    myState.orders[i].duration++;
+  if (myState.orders) {
+    myState.orders.forEach((order, i) => {
+      myState.orders[i].duration++;
 
-    if (candle.Open < myState.bank) {
-      if (order.price === 0) {
-        myState.bank -= candle.Open;
-        myState.trades.push(createTrade(order, candle, candleRow));
-        myState.orders.splice(myState.orders.indexOf(order), 1);
-        return;
-      }
-
-      if (order.type === LONG) {
-        if (order.price < candle.High) {
+      if (candle.Open < myState.bank) {
+        if (order.price === 0) {
           myState.bank -= candle.Open;
           myState.trades.push(createTrade(order, candle, candleRow));
           myState.orders.splice(myState.orders.indexOf(order), 1);
+          return;
         }
-      }
 
-      if (order.type === SHORT) {
-        if (order.price > candle.High) {
-          myState.bank -= candle.Open;
-          myState.trades.push(createTrade(order, candle, candleRow));
-          myState.orders.splice(myState.orders.indexOf(order), 1);
+        if (order.type === LONG) {
+          if (order.price < candle.High) {
+            myState.bank -= candle.Open;
+            myState.trades.push(createTrade(order, candle, candleRow));
+            myState.orders.splice(myState.orders.indexOf(order), 1);
+          }
+        }
+
+        if (order.type === SHORT) {
+          if (order.price > candle.High) {
+            myState.bank -= candle.Open;
+            myState.trades.push(createTrade(order, candle, candleRow));
+            myState.orders.splice(myState.orders.indexOf(order), 1);
+          }
         }
       }
-    }
-  });
+    });
+  }
 
   return myState;
 }
@@ -100,45 +102,47 @@ export function processOrders(candle: Candle, candleRow: number, state: orderSta
 export function processTrades(candle: Candle, candleRow: number, df: DataFrame, state: orderState, dynamicTrading?: DynamicTradingFunction): orderState {
   const myState = { ...state };
 
-  myState.trades.forEach((trade, i) => {
-    myState.trades[i].duration++;
+  if (myState.trades) {
+    myState.trades.forEach((trade, i) => {
+      myState.trades[i].duration++;
 
-    const exitPrice = processExitConditions(candle, trade);
+      const exitPrice = processExitConditions(candle, trade);
 
-    if (!exitPrice && dynamicTrading) {
-      // Remove and potentially adjust stop loss
-      myState.trades.splice(state.trades.indexOf(trade), 1);
-      myState.trades.push(dynamicTrading(trade, candle, candleRow, df));
-      return;
-    }
-
-    if (exitPrice) {
-      const purchasePrice = trade.price === 0 ? candle['Open'] : trade.price;
-      let profit = (exitPrice - purchasePrice) * trade.size;
-      if (trade.type === 'short') {
-        profit = -profit;
+      if (!exitPrice && dynamicTrading) {
+        // Remove and potentially adjust stop loss
+        myState.trades.splice(state.trades.indexOf(trade), 1);
+        myState.trades.push(dynamicTrading(trade, candle, candleRow, df));
+        return;
       }
 
-      myState.bank += exitPrice * trade.size;
+      if (exitPrice) {
+        const purchasePrice = trade.price === 0 ? candle['Open'] : trade.price;
+        let profit = (exitPrice - purchasePrice) * trade.size;
+        if (trade.type === 'short') {
+          profit = -profit;
+        }
 
-      myState.completedTrades.push({
-        ...trade,
-        exitPrice: exitPrice,
-        exitCandle: candle,
-        exitCandleRow: candleRow,
-        profit,
-        orderDuration: differenceInDays(
-          parseISO(candle.DateTime),
-          parseISO(trade.entryCandle.DateTime)
-        ),
-        durationInHours: differenceInHours(
-          parseISO(candle.DateTime),
-          parseISO(trade.entryCandle.DateTime)
-        ),
-      });
-      myState.trades.splice(myState.trades.indexOf(trade), 1);
-    }
-  });
+        myState.bank += exitPrice * trade.size;
+
+        myState.completedTrades.push({
+          ...trade,
+          exitPrice: exitPrice,
+          exitCandle: candle,
+          exitCandleRow: candleRow,
+          profit,
+          orderDuration: differenceInDays(
+            parseISO(candle.DateTime),
+            parseISO(trade.entryCandle.DateTime)
+          ),
+          durationInHours: differenceInHours(
+            parseISO(candle.DateTime),
+            parseISO(trade.entryCandle.DateTime)
+          ),
+        });
+        myState.trades.splice(myState.trades.indexOf(trade), 1);
+      }
+    });
+  }
 
   return myState;
 }

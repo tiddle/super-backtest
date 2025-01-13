@@ -1,4 +1,4 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 import { parseISO } from 'npm:date-fns/parseISO';
 import type { marketDetails, Trade } from '../../types.ts';
 import { createFiles, createOHLCV, statsOutput, tradeDetails } from '../../core/output.ts';

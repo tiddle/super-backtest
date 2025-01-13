@@ -28,6 +28,8 @@ export function init({
   bankParam,
   dynamicTradingFunc,
 }: initParams, df: DataFrame) {
+  let localDf: DataFrame;
+
   state.bank = bankParam;
 
   if (createOrderFunc) {
@@ -38,21 +40,20 @@ export function init({
     dynamicTrading = dynamicTradingFunc;
   }
 
-  const lineA = SMA(300, df, 'lineA');
-  const FVGData = FVG(df, 'FVG');
+  localDf = SMA(300, df, 'lineA');
+  localDf = FVG(localDf, 'FVG');
 
-  return df;
+  return localDf;
 }
 
 export function iterator(df: DataFrame): orderState {
-  for (let i = 0; i < df.index.length; i++) {
-    const row = df.iloc({ rows: [i] });
-    const candle: Candle = (toJSON(row) as Candle[])[0];
+  const candles = df.toRecords();
 
-    state = processTrades(candle, i, df, state, dynamicTrading);
+  candles.forEach((candle: Candle, i: number) => {
+    state = processTrades(candle, df, i, state);
     state = processOrders(candle, i, state);
-    state = checkForSignals(candle, df, state);
-  }
+    state = checkForSignals(candle, state, df);
+  });
 
   return state;
 }

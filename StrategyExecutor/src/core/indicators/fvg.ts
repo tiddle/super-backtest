@@ -3,7 +3,6 @@ import { DataFrame, Series, col } from 'npm:nodejs-polars';
 import { Candle, FVGData } from '../../types.ts';
 
 export function FVG(df: DataFrame, columnName: string) {
-  let localDf: DataFrame;
   // Fair Value Gap
   const name = columnName || 'FVG';
 
@@ -33,7 +32,7 @@ export function FVG(df: DataFrame, columnName: string) {
   const FVGCloseSeries = Series(name + 'Close', FVGClose);
   const FVGTypeSeries = Series(name + 'Type', FVGType);
 
-  const output = df.withColumns([FVGHighSeries, FVGLowSeries, FVGCloseSeries, FVGTypeSeries]);
+  const output: DataFrame = df.withColumns([FVGHighSeries, FVGLowSeries, FVGCloseSeries, FVGTypeSeries]);
 
   return output;
 }

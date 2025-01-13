@@ -1,4 +1,4 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 import {
   parseISO,
   differenceInDays,

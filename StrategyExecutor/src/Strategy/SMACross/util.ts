@@ -1,48 +1,48 @@
-import { DataFrame } from 'npm:danfojs-node';
+import { DataFrame } from 'npm:nodejs-polars';
 
 export function barCrossUp(
-  df: DataFrame,
+	df: DataFrame,
 ): number[] {
-  const close = df.getColumn('Close').toArray();
-  const open = df.getColumn('Open').toArray();
-  const lineA = df.getColumn('SMA').toArray();
+	const close = df.getColumn('Close').toArray();
+	const open = df.getColumn('Open').toArray();
+	const lineA = df.getColumn('SMA').toArray();
 
 
-  return close.reduce((acc: number[], curr: number, i: number) => {
-    if (!lineA[i]) {
-      acc[i] = 0;
-      return acc;
-    }
+	return close.reduce((acc: number[], curr: number, i: number) => {
+		if (!lineA[i]) {
+			acc[i] = 0;
+			return acc;
+		}
 
-    if (curr > open[i] && curr > lineA[i] && open[i] < lineA[i] && open[i - 1] < close[i - 1] && acc[i - 1] !== 1) {
-      acc[i] = 1;
-    } else {
-      acc[i] = 0;
-    }
+		if (curr > open[i] && curr > lineA[i] && open[i] < lineA[i] && open[i - 1] < close[i - 1] && acc[i - 1] !== 1) {
+			acc[i] = 1;
+		} else {
+			acc[i] = 0;
+		}
 
-    return acc;
-  }, [] as number[]);
+		return acc;
+	}, [] as number[]);
 }
 
 export function barCrossDown(
-  df: DataFrame,
+	df: DataFrame,
 ): number[] {
-  const close = df.getColumn('Close').toArray();
-  const open = df.getColumn('Open').toArray();
-  const lineA = df.getColumn('SMA').toArray();
+	const close = df.getColumn('Close').toArray();
+	const open = df.getColumn('Open').toArray();
+	const lineA = df.getColumn('SMA').toArray();
 
-  return close.reduce((acc: number[], curr: number, i: number) => {
-    if (!lineA[i]) {
-      acc[i] = 0;
-      return acc;
-    }
+	return close.reduce((acc: number[], curr: number, i: number) => {
+		if (!lineA[i]) {
+			acc[i] = 0;
+			return acc;
+		}
 
-    if (curr < open[i] && curr < lineA[i] && open[i] > lineA[i] && open[i - 1] > close[i - 1] && acc[i - 1] !== 1) {
-      acc[i] = 1;
-    } else {
-      acc[i] = 0;
-    }
+		if (curr < open[i] && curr < lineA[i] && open[i] > lineA[i] && open[i - 1] > close[i - 1] && acc[i - 1] !== 1) {
+			acc[i] = 1;
+		} else {
+			acc[i] = 0;
+		}
 
-    return acc;
-  }, [] as number[]);
+		return acc;
+	}, [] as number[]);
 }

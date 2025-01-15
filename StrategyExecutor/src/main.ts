@@ -64,6 +64,6 @@ strategies.forEach(async strategy => {
 	const dfIndicators = strategy.initFunc(params, df);
 	const { completedTrades } = strategy.iteratorFunc(dfIndicators);
 
-	const stats = strategy.createOutputFunc(df, completedTrades, params.name, marketDetails);
+	const stats = strategy.createOutputFunc(dfIndicators, completedTrades, params.name, marketDetails);
 	display(stats);
 });

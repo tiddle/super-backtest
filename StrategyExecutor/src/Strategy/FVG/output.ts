@@ -14,16 +14,18 @@ export function createOutputFiles(
 	const OHLCV = createOHLCV(df);
 	const path = `../data/${name}`;
 
+	console.log(df.tail().toRecords(), OHLCV[OHLCV.length - 1]);
+
 	OHLCV.forEach((curr) => {
 		if (Array.isArray(curr)) {
 			if (curr[6]) {
 				SMA.push([curr[0] as number, curr[6] as number]);
 			}
 
-			// 7 Low, 8 High, 9 Type, 10 Close
+			// 7 Low, 8 High, 9 Close, 10 Type
 			if (curr[7]) {
-				const close = parseISO(curr[10] as string).getTime();
-				FVG.push([curr[0] as number, curr[7] as number, curr[8] as number, curr[9] as number, close || 0]);
+				const close = parseISO(curr[9] as string || 0).getTime();
+				FVG.push([curr[0] as number, curr[7] as number, curr[8] as number, close || 0, curr[10] as number]);
 			}
 		}
 	});

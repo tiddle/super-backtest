@@ -33,6 +33,9 @@ export function tradeDetails(completedTrades: Trade[]): number[][] {
 	});
 }
 
+export const tradeHeadings = ['Timestamp', 'Purchase Price', 'Exit Candle', 'Exit Price', 'Type', 'Entry Candle Row', 'Exit Candle Row', 'Order Size', 'Profit', 'Profit & Loss %', 'Duration'];
+
+
 export function createOHLCV(df: DataFrame): number[][] {
 	return df.toRecords().map((c) => {
 		const curr = Object.values(c);
@@ -178,7 +181,7 @@ function computeReturnPct(values: Series) {
 	return ((finalValue - initialValue) / initialValue) * 100;
 }
 
-export async function createFiles(path = '', valArr: FileData[] = []) {
+export async function createFiles(path = '', valArr: FileData[] | string[] = []) {
 	if (valArr.length === 0) {
 		return;
 	}

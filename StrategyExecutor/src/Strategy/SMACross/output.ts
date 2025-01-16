@@ -1,6 +1,6 @@
 import { DataFrame } from 'npm:nodejs-polars';
 import type { marketDetails, Trade } from '../../types.ts';
-import { createFiles, createOHLCV, statsOutput, tradeDetails } from '../../core/output.ts';
+import { createFiles, createOHLCV, statsOutput, tradeDetails, tradeHeadings } from '../../core/output.ts';
 
 export function createOutputFiles(
 	df: DataFrame,
@@ -55,6 +55,9 @@ export function createOutputFiles(
 	}, {
 		name: 'trades',
 		data: tradeDetailsArr
+	}, {
+		name: 'tradeHeadings',
+		data: tradeHeadings
 	}, {
 		name: 'marketDetails',
 		data: marketDetails

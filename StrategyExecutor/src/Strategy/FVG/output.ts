@@ -14,8 +14,6 @@ export function createOutputFiles(
 	const OHLCV = createOHLCV(df);
 	const path = `../data/${name}`;
 
-	console.log(df.tail().toRecords(), OHLCV[OHLCV.length - 1]);
-
 	OHLCV.forEach((curr) => {
 		if (Array.isArray(curr)) {
 			if (curr[6]) {

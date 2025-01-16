@@ -50,7 +50,7 @@ export function iterator(df: DataFrame): orderState {
 	const candles = df.toRecords();
 
 	candles.forEach((candle: Candle, i: number) => {
-		state = processTrades(candle, df, i, state);
+		state = processTrades(candle, i, df, state);
 		state = processOrders(candle, i, state);
 		state = checkForSignals(candle, df, state);
 	});

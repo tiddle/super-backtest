@@ -52,7 +52,7 @@ const marketDetails: marketDetails = {
 	timeframe
 }
 
-strategies.forEach(async strategy => {
+for (const strategy of strategies) {
 	const df = createDataFrame(historyCandlesDF);
 	const params = { ...strategy };
 
@@ -66,4 +66,4 @@ strategies.forEach(async strategy => {
 
 	const stats = strategy.createOutputFunc(dfIndicators, completedTrades, params.name, marketDetails);
 	display(stats);
-});
+}

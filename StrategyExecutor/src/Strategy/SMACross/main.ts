@@ -58,7 +58,7 @@ export function iterator(df: DataFrame) {
 	const candles = df.toRecords();
 
 	candles.forEach((candle: Candle, i: number) => {
-		purchases = processTrades(candle, df, i, purchases);
+		purchases = processTrades(candle, i, df, purchases, dynamicTrading);
 		purchases = processOrders(candle, i, purchases);
 		purchases = checkForSignals(candle, df, purchases);
 	});

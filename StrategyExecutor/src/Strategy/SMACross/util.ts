@@ -14,7 +14,7 @@ export function barCrossUp(
 			return acc;
 		}
 
-		if (curr > open[i] && curr > lineA[i] && open[i] < lineA[i] && open[i - 1] < close[i - 1] && acc[i - 1] !== 1) {
+		if (i > 0 && curr > open[i] && curr > lineA[i] && open[i] < lineA[i] && open[i - 1] < close[i - 1] && acc[i - 1] !== 1) {
 			acc[i] = 1;
 		} else {
 			acc[i] = 0;
@@ -37,7 +37,7 @@ export function barCrossDown(
 			return acc;
 		}
 
-		if (curr < open[i] && curr < lineA[i] && open[i] > lineA[i] && open[i - 1] > close[i - 1] && acc[i - 1] !== 1) {
+		if (i > 0 && curr < open[i] && curr < lineA[i] && open[i] > lineA[i] && open[i - 1] > close[i - 1] && acc[i - 1] !== 1) {
 			acc[i] = 1;
 		} else {
 			acc[i] = 0;

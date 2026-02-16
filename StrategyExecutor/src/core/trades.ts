@@ -35,11 +35,11 @@ export function processExitConditions(candle: Candle, trade: Trade) {
   }
 
   if (trade.type === SHORT) {
-    if (stopLoss && stopLoss < candle.Low) {
+    if (stopLoss && stopLoss < candle.High) {
       return stopLoss;
     }
 
-    if (takeProfit && takeProfit > candle.High) {
+    if (takeProfit && takeProfit > candle.Low) {
       return takeProfit;
     }
 
@@ -97,17 +97,17 @@ export function processOrders(candle: Candle, candleRow: number, state: orderSta
   return myState;
 }
 
-export function processTrades(candle: Candle, candleRow: number, df: DataFrame, state: orderState, dynamicTrading?: DynamicTradingFunction): orderState {
+export function processTrades(candle: Candle, i: number, df: DataFrame, state: orderState, dynamicTrading?: DynamicTradingFunction): orderState {
   const myState = { ...state };
-  myState.trades.forEach((trade, i) => {
-    myState.trades[i].duration++;
+  myState.trades.forEach((trade, tradeIdx) => {
+    myState.trades[tradeIdx].duration++;
 
     const exitPrice = processExitConditions(candle, trade);
 
     if (!exitPrice && dynamicTrading) {
       // Remove and potentially adjust stop loss
       myState.trades.splice(state.trades.indexOf(trade), 1);
-      myState.trades.push(dynamicTrading(trade, candle, candleRow, df));
+      myState.trades.push(dynamicTrading(trade, candle, i, df));
       return;
     }
 
@@ -124,7 +124,7 @@ export function processTrades(candle: Candle, candleRow: number, df: DataFrame, 
         ...trade,
         exitPrice: exitPrice,
         exitCandle: candle,
-        exitCandleRow: candleRow,
+        exitCandleRow: i,
         profit,
         orderDuration: differenceInDays(
           parseISO(candle.DateTime),
